@@ -19,7 +19,7 @@ func DatabaseConnection() *gorm.DB {
 	}
 	DB_NAME := os.Getenv("DB_NAME")
 
-	strConnection := CreateDatabase(DB_NAME)
+	strConnection := CreateDatabase()
 	dsn := fmt.Sprintf(strConnection+"  dbname=%s",
 		DB_NAME,
 	)
@@ -32,7 +32,7 @@ func DatabaseConnection() *gorm.DB {
 }
 
 // Crear la nueva base de datos
-func CreateDatabase(DB_NAME string) string {
+func CreateDatabase() string {
 	DB_USER := os.Getenv("DB_USER")
 	DB_PASSWORD := os.Getenv("DB_PASSWORD")
 	DB_HOST := os.Getenv("DB_HOST")
@@ -47,23 +47,23 @@ func CreateDatabase(DB_NAME string) string {
 	)
 
 	// Conectar al servidor PostgreSQL sin especificar una base de datos
-	db, err := gorm.Open(postgres.Open(strConnection), &gorm.Config{})
+	_, err := gorm.Open(postgres.Open(strConnection), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
-	query := fmt.Sprintf("SELECT 1 FROM pg_database WHERE datname='%s'", DB_NAME)
-	errd := db.Exec(query)
-	if errd.RowsAffected == 0 {
-		// Crear la base de datos usando una consulta SQL cruda
-		createDBSQL := fmt.Sprintf("CREATE DATABASE %s", DB_NAME)
-		err = db.Exec(createDBSQL).Error
+	// query := fmt.Sprintf("SELECT 1 FROM pg_database WHERE datname='%s'", DB_NAME)
+	// errd := db.Exec(query)
+	// if errd.RowsAffected == 0 {
+	// 	// Crear la base de datos usando una consulta SQL cruda
+	// 	createDBSQL := fmt.Sprintf("CREATE DATABASE %s", DB_NAME)
+	// 	err = db.Exec(createDBSQL).Error
 
-		if err != nil {
-			log.Fatalf("Error al crear la base de datos: %v", err)
-		}
+	// 	if err != nil {
+	// 		log.Fatalf("Error al crear la base de datos: %v", err)
+	// 	}
 
-		fmt.Printf("Base de datos '%s' creada exitosamente.\n", DB_NAME)
-	}
+	// 	fmt.Printf("Base de datos '%s' creada exitosamente.\n", DB_NAME)
+	// }
 
 	return strConnection
 }
